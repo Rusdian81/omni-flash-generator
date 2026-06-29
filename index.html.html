@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OMNI FLASH — Cinematic AI Studio</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+:root{--bg:#0a0a0f;--surface:#12121a;--surface2:#1a1a26;--border:#2a2a3a;--accent:#7c5cfc;--accent2:#fc5c7d;--gold:#f5c842;--text:#e8e8f0;--muted:#7070a0;--success:#4ade80;--radius:10px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:15px;line-height:1.6;min-height:100vh;}
+header{border-bottom:1px solid var(--border);padding:15px 26px;display:flex;align-items:center;gap:13px;}
+.logo-mark{width:33px;height:33px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:#fff;flex-shrink:0;}
+.logo-text{font-size:15px;font-weight:600;letter-spacing:.04em;}
+.logo-sub{font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;}
+.hdr-badge{margin-left:auto;background:rgba(124,92,252,.15);border:1px solid rgba(124,92,252,.3);color:var(--accent);font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;letter-spacing:.06em;text-transform:uppercase;}
+.main-tabs{display:flex;border-bottom:1px solid var(--border);padding:0 26px;}
+.main-tab{padding:11px 18px;font-size:13px;font-weight:600;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;transition:all .15s;letter-spacing:.02em;}
+.main-tab:hover{color:var(--text);}
+.main-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+main{display:flex;height:calc(100vh - 107px);}
+.panel-left{width:390px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:15px;}
+.panel-right{flex:1;overflow-y:auto;padding:22px;display:flex;flex-direction:column;gap:14px;}
+.slabel{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;}
+.field{display:flex;flex-direction:column;gap:5px;}
+label{font-size:13px;font-weight:500;color:#b0b0cc;}
+input[type="text"],textarea,select{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:14px;padding:8px 12px;width:100%;transition:border-color .2s;outline:none;}
+input[type="text"]:focus,textarea:focus,select:focus{border-color:var(--accent);}
+textarea{resize:vertical;min-height:65px;}
+select option{background:#1a1a26;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+.upload-zone{border:1.5px dashed var(--border);border-radius:var(--radius);padding:14px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);position:relative;overflow:hidden;}
+.upload-zone:hover{border-color:var(--accent);background:rgba(124,92,252,.04);}
+.upload-zone.has-img{border-color:var(--success);border-style:solid;}
+.upload-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.upload-preview{width:100%;max-height:110px;object-fit:contain;border-radius:6px;margin-bottom:6px;display:none;}
+.upload-icon{font-size:20px;color:var(--muted);margin-bottom:3px;}
+.upload-lbl{font-size:12px;color:var(--muted);}
+.upload-lbl strong{color:var(--accent);}
+.upload-zone.has-img .upload-icon{display:none;}
+.analyze-btn{width:100%;background:rgba(124,92,252,.15);border:1px solid rgba(124,92,252,.3);border-radius:var(--radius);color:var(--accent);font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;padding:8px;cursor:pointer;transition:all .15s;display:none;margin-top:7px;}
+.analyze-btn:hover{background:rgba(124,92,252,.25);}
+.analyze-btn.vis{display:block;}
+.analyze-btn:disabled{opacity:.4;cursor:not-allowed;}
+.ai-result{background:rgba(74,222,128,.07);border:1px solid rgba(74,222,128,.2);border-radius:var(--radius);padding:9px 11px;font-size:12px;display:none;margin-top:6px;}
+.ai-result.vis{display:block;}
+.ai-tag{color:var(--success);font-weight:700;font-size:10px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px;}
+.pill-group{display:flex;flex-wrap:wrap;gap:6px;}
+.pill{padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;color:var(--muted);background:var(--surface);user-select:none;}
+.pill:hover{border-color:var(--accent);color:var(--text);}
+.pill.active{background:rgba(124,92,252,.18);border-color:var(--accent);color:var(--accent);}
+.pill.dur{font-family:'Space Mono',monospace;}
+.pill.dur.active{background:rgba(245,200,66,.15);border-color:var(--gold);color:var(--gold);}
+.pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.pcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:7px 5px;cursor:pointer;transition:all .15s;text-align:center;}
+.pcard:hover{border-color:var(--accent);}
+.pcard.active{border-color:var(--accent2);background:rgba(252,92,125,.1);}
+.pcard .pn{font-size:12px;font-weight:600;}
+.pcard .pd{font-size:10px;color:var(--muted);font-family:'Space Mono',monospace;}
+.scene-info{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:9px 12px;font-size:13px;display:flex;align-items:center;gap:9px;}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;}
+.scene-info span{color:var(--muted);}
+.scene-info strong{color:var(--gold);}
+.btn-gen{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:var(--radius);color:#fff;font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;padding:12px;cursor:pointer;transition:opacity .2s,transform .1s;letter-spacing:.04em;width:100%;}
+.btn-gen:hover{opacity:.9;transform:translateY(-1px);}
+.btn-gen:active{transform:translateY(0);}
+.btn-gen:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.divider{height:1px;background:var(--border);}
+.out-ph{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--muted);gap:10px;text-align:center;}
+.out-ph .ic{font-size:34px;opacity:.22;}
+.out-hdr{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:7px;}
+.out-title{font-size:16px;font-weight:600;}
+.abadge{font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(252,92,125,.15);border:1px solid rgba(252,92,125,.3);color:var(--accent2);font-weight:600;letter-spacing:.06em;text-transform:uppercase;}
+.jblock{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.jblock-hdr{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-bottom:1px solid var(--border);background:var(--surface2);}
+.jblock-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);}
+.btn-copy{background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-family:'Space Grotesk',sans-serif;font-size:12px;padding:3px 9px;cursor:pointer;transition:all .15s;}
+.btn-copy:hover{border-color:var(--accent);color:var(--accent);}
+.btn-copy.copied{border-color:var(--success);color:var(--success);}
+.jcontent{padding:13px;font-family:'Space Mono',monospace;font-size:12px;line-height:1.7;white-space:pre-wrap;word-break:break-all;color:#c0c0e0;max-height:340px;overflow-y:auto;}
+.jk{color:#7c5cfc;}.js{color:#f5c842;}.jn{color:#4ade80;}
+.btn-dl{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:600;padding:8px 16px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:7px;}
+.btn-dl:hover{border-color:var(--accent);background:rgba(124,92,252,.1);}
+.lbar{height:3px;background:var(--border);border-radius:2px;overflow:hidden;display:none;}
+.lbar.on{display:block;}
+.lbar-in{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;animation:lp 2.5s ease-in-out infinite;}
+@keyframes lp{0%{width:0%;margin-left:0}50%{width:60%;margin-left:20%}100%{width:0%;margin-left:100%}}
+.stxt{font-size:12px;color:var(--muted);font-family:'Space Mono',monospace;display:none;}
+.stxt.on{display:block;}
+.stab{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;color:var(--muted);}
+.stab:hover{border-color:var(--accent);color:var(--text);}
+.stab.active{border-color:var(--accent);color:var(--accent);background:rgba(124,92,252,.1);}
+.icard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;margin-bottom:2px;}
+.icard-hdr{background:var(--surface2);padding:9px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.ibadge{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:4px;}
+.ib-hero{background:rgba(124,92,252,.2);color:var(--accent);}
+.ib-life{background:rgba(252,92,125,.2);color:var(--accent2);}
+.ib-mj{background:rgba(245,200,66,.15);color:var(--gold);}
+.ib-flux{background:rgba(74,222,128,.15);color:var(--success);}
+.ib-neg{background:rgba(160,160,160,.15);color:var(--muted);}
+.ptxt{padding:13px;font-family:'Space Mono',monospace;font-size:12px;line-height:1.8;color:#c0c0e0;white-space:pre-wrap;word-break:break-word;}
+.tab-panel{display:none;}
+.tab-panel.active{display:flex;width:100%;}
+.tag-pill{font-size:12px;padding:2px 8px;border-radius:4px;display:inline-block;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo-mark">OF</div>
+  <div><div class="logo-text">OMNI FLASH</div><div class="logo-sub">Cinematic AI Studio v4.0</div></div>
+  <div class="hdr-badge">AI Powered</div>
+</header>
+<div class="main-tabs">
+  <div class="main-tab active" onclick="switchTab('video')">&#9654;&nbsp; Video Prompt</div>
+  <div class="main-tab" onclick="switchTab('image')">&#9670;&nbsp; Image Prompt</div>
+</div>
+<main>
+
+<!-- VIDEO TAB -->
+<div class="tab-panel active" id="tab-video">
+  <div class="panel-left">
+    <div>
+      <div class="slabel">Upload Produk</div>
+      <div class="upload-zone" id="vp-zone">
+        <input type="file" id="vp-file" accept="image/*" onchange="handleUpload(event,'vp')">
+        <div class="upload-icon">&#128247;</div>
+        <div class="upload-lbl" id="vp-lbl"><strong>Klik atau drag</strong> foto produk</div>
+        <img class="upload-preview" id="vp-prev">
+      </div>
+      <button class="analyze-btn" id="vp-analyze" onclick="analyzeProduct()">&#128269; Analisis Produk dengan AI</button>
+      <div class="ai-result" id="vp-airesult"><div class="ai-tag">AI Detected</div><div id="vp-aitext"></div></div>
+    </div>
+    <div class="field"><label>Nama produk</label><input type="text" id="vp-name" placeholder="Auto-fill setelah analisis, atau isi manual"></div>
+    <div class="field"><label>Deskripsi singkat</label><textarea id="vp-desc" placeholder="Auto-fill setelah analisis, atau isi manual"></textarea></div>
+    <div>
+      <div class="slabel">Upload Talent (opsional)</div>
+      <div class="upload-zone" id="vt-zone">
+        <input type="file" id="vt-file" accept="image/*" onchange="handleUpload(event,'vt')">
+        <div class="upload-icon">&#128100;</div>
+        <div class="upload-lbl" id="vt-lbl"><strong>Klik atau drag</strong> foto talent</div>
+        <img class="upload-preview" id="vt-prev">
+      </div>
+      <div class="field" style="margin-top:7px;"><label>Atau deskripsikan talent</label><input type="text" id="vt-text" placeholder="cth: Wanita 25th, kulit cerah, casual style"></div>
+    </div>
+    <div class="divider"></div>
+    <div>
+      <div class="slabel">Target & Bahasa</div>
+      <div class="grid-2">
+        <div class="field"><label>Negara</label>
+          <select id="v-country"><option>Indonesia</option><option>Malaysia</option><option>Singapore</option><option>Thailand</option><option>Philippines</option></select>
+        </div>
+        <div class="field"><label>Platform sosial</label>
+          <select id="v-platform"><option>TikTok</option><option>Instagram Reels</option><option>YouTube Shorts</option><option>Shopee Video</option></select>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="slabel">Gaya Konten</div>
+      <div class="pill-group" id="v-style">
+        <div class="pill active" data-val="UGC">UGC</div>
+        <div class="pill" data-val="Product Demo">Product Demo</div>
+        <div class="pill" data-val="Cinematic Lifestyle">Cinematic</div>
+        <div class="pill" data-val="Testimonial">Testimonial</div>
+        <div class="pill" data-val="Before After">Before/After</div>
+        <div class="pill" data-val="POV Creator">POV Creator</div>
+      </div>
+    </div>
+    <div>
+      <div class="slabel">Durasi Video</div>
+      <div class="pill-group" id="v-dur">
+        <div class="pill dur" data-val="10">10s</div>
+        <div class="pill dur active" data-val="15">15s</div>
+        <div class="pill dur" data-val="25">25s</div>
+        <div class="pill dur" data-val="30">30s</div>
+      </div>
+    </div>
+    <div>
+      <div class="slabel">Platform Video Generator</div>
+      <div class="pgrid" id="v-platforms">
+        <div class="pcard active" data-val="Runway" data-s="6"><div class="pn">Runway</div><div class="pd">6s</div></div>
+        <div class="pcard active" data-val="Pika" data-s="6"><div class="pn">Pika</div><div class="pd">6s</div></div>
+        <div class="pcard active" data-val="Hailuo" data-s="6"><div class="pn">Hailuo</div><div class="pd">6s</div></div>
+        <div class="pcard" data-val="Kling" data-s="8"><div class="pn">Kling</div><div class="pd">8s</div></div>
+        <div class="pcard" data-val="PixVerse" data-s="8"><div class="pn">PixVerse</div><div class="pd">8s</div></div>
+        <div class="pcard" data-val="Seedance" data-s="10"><div class="pn">Seedance</div><div class="pd">10s</div></div>
+        <div class="pcard" data-val="Veo" data-s="10"><div class="pn">Veo</div><div class="pd">10s</div></div>
+      </div>
+    </div>
+    <div class="scene-info"><div class="sdot"></div><div><span>Estimasi: </span><strong id="sc-count">3 scenes</strong><span> untuk </span><strong id="sc-dur">15s</strong><span> @ </span><strong id="sc-per">6s/scene</strong></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+  <button class="btn-gen" id="v-btn" onclick="generateVideo(1)" style="font-size:13px;">Generate 1 Angle</button>
+  <button class="btn-gen" id="v-btn3" onclick="generateVideo(3)" style="font-size:13px;background:linear-gradient(135deg,#f5c842,#fc5c7d);">3 Angles Sekaligus</button>
+</div>
+  </div>
+  <div class="panel-right" id="v-out"><div class="out-ph"><div class="ic">&#9654;</div><p>Upload foto produk, isi detail, lalu klik Generate.</p></div></div>
+</div>
+
+<!-- IMAGE TAB -->
+<div class="tab-panel" id="tab-image">
+  <div class="panel-left">
+    <div>
+      <div class="slabel">Upload Produk</div>
+      <div class="upload-zone" id="ip-zone">
+        <input type="file" id="ip-file" accept="image/*" onchange="handleUpload(event,'ip')">
+        <div class="upload-icon">&#128247;</div>
+        <div class="upload-lbl" id="ip-lbl"><strong>Klik atau drag</strong> foto produk</div>
+        <img class="upload-preview" id="ip-prev">
+      </div>
+    </div>
+    <div class="field"><label>Nama produk</label><input type="text" id="ip-name" placeholder="Nama produk"></div>
+    <div class="field"><label>Deskripsi / keunggulan</label><textarea id="ip-desc" placeholder="Fungsi, bahan unggulan, target pasar..."></textarea></div>
+    <div>
+      <div class="slabel">Upload Talent (opsional)</div>
+      <div class="upload-zone" id="it-zone">
+        <input type="file" id="it-file" accept="image/*" onchange="handleUpload(event,'it')">
+        <div class="upload-icon">&#128100;</div>
+        <div class="upload-lbl" id="it-lbl"><strong>Klik atau drag</strong> foto talent</div>
+        <img class="upload-preview" id="it-prev">
+      </div>
+      <div class="field" style="margin-top:7px;"><label>Atau deskripsikan talent</label><input type="text" id="it-text" placeholder="cth: Wanita 28th, glowing skin, modern style"></div>
+    </div>
+    <div class="divider"></div>
+    <div>
+      <div class="slabel">Gaya Visual</div>
+      <div class="pill-group" id="i-style">
+        <div class="pill active" data-val="Commercial Editorial">Editorial</div>
+        <div class="pill" data-val="Soft Aesthetic">Soft Aesthetic</div>
+        <div class="pill" data-val="Bold & Vibrant">Bold</div>
+        <div class="pill" data-val="Minimalist Clean">Minimalist</div>
+        <div class="pill" data-val="Luxury Premium">Luxury</div>
+        <div class="pill" data-val="Dark Moody">Dark Moody</div>
+      </div>
+    </div>
+    <div>
+      <div class="slabel">Aspect Ratio</div>
+      <div class="pill-group" id="i-ratio">
+        <div class="pill active" data-val="9:16">9:16 TikTok</div>
+        <div class="pill" data-val="1:1">1:1 Feed</div>
+        <div class="pill" data-val="4:5">4:5 IG</div>
+        <div class="pill" data-val="16:9">16:9 Wide</div>
+      </div>
+    </div>
+    <button class="btn-gen" id="i-btn" onclick="generateImage()">Generate Image Prompts</button>
+  </div>
+  <div class="panel-right" id="i-out"><div class="out-ph"><div class="ic">&#9670;</div><p>Upload produk dan isi detail untuk generate image prompt.</p></div></div>
+</div>
+</main>
+
+<script>
+const API="https://api.anthropic.com/v1/messages",MDL="claude-sonnet-4-6";
+const b64store={vp:null,vt:null,ip:null,it:null};
+const STORE={};let _si=0;
+function stash(v){const k='k'+(++_si);STORE[k]=String(v||'');return k;}
+
+function copyText(text,btn){
+  const done=()=>{btn.textContent='Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},2000);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,btn,done));
+  } else { fallbackCopy(text,btn,done); }
+}
+function fallbackCopy(text,btn,done){
+  const ta=document.createElement('textarea');
+  ta.value=text; ta.style.cssText='position:fixed;top:0;left:0;opacity:0;';
+  document.body.appendChild(ta); ta.select();
+  try{document.execCommand('copy');done();}catch(e){alert('Copy gagal, select manual:\n'+text);}
+  document.body.removeChild(ta);
+}
+
+// Event delegation — handles all copy & download buttons
+document.addEventListener('click',function(e){
+  const btn=e.target.closest('[data-copy-key]');
+  const dlBtn=e.target.closest('[data-dl-key]');
+  if(btn){
+    const key=btn.dataset.copyKey;
+    copyText(STORE[key]||'',btn);
+  }
+  if(dlBtn){
+    const key=dlBtn.dataset.dlKey;
+    const name=dlBtn.dataset.dlName||'prompt.json';
+    const a=document.createElement('a');
+    a.href='data:application/json;charset=utf-8,'+encodeURIComponent(STORE[key]||'');
+    a.download=name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  }
+});
+let vStyle="UGC",vDur=15,vScene=6,vPlatforms=["Runway","Pika","Hailuo"];
+let iStyle="Commercial Editorial",iRatio="9:16";
+const LANG={Indonesia:"Bahasa Indonesia",Malaysia:"Bahasa Malaysia",Singapore:"Singapore English",Thailand:"Thai",Philippines:"Filipino English"};
+
+function switchTab(t){
+  document.querySelectorAll('.main-tab').forEach((el,i)=>el.classList.toggle('active',['video','image'][i]===t));
+  document.querySelectorAll('.tab-panel').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+}
+
+function handleUpload(e,key){
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    const b64=r.result.split(',')[1];
+    b64store[key]={data:b64,mime:f.type||'image/jpeg'};
+    const prev=document.getElementById(key+'-prev');
+    prev.src='data:'+f.type+';base64,'+b64; prev.style.display='block';
+    document.getElementById(key+'-zone').classList.add('has-img');
+    document.getElementById(key+'-lbl').innerHTML='<strong>'+f.name+'</strong> — klik ganti';
+    if(key==='vp') document.getElementById('vp-analyze').classList.add('vis');
+  };
+  r.readAsDataURL(f);
+}
+
+async function analyzeProduct(){
+  if(!b64store.vp){alert('Upload foto produk dulu!');return;}
+  const btn=document.getElementById('vp-analyze');
+  btn.disabled=true; btn.textContent='Menganalisis...';
+  try{
+    const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01'},
+      body:JSON.stringify({model:MDL,max_tokens:600,messages:[{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:b64store.vp.mime,data:b64store.vp.data}},
+        {type:'text',text:'Analyze this product image. Return ONLY JSON (no markdown): {"product_name":"","description":"1-2 sentences on function and key features","category":"","target_audience":""}'}
+      ]}]})});
+    const data=await res.json();
+    let raw=data.content?.map(c=>c.text||'').join('')||'';
+    const fence=raw.match(/```(?:json)?\s*([\s\S]*?)```/); if(fence) raw=fence[1].trim();
+    const bi=raw.indexOf('{'); if(bi>0) raw=raw.slice(bi);
+    const p=JSON.parse(raw);
+    document.getElementById('vp-name').value=p.product_name||'';
+    document.getElementById('vp-desc').value=p.description||'';
+    const el=document.getElementById('vp-airesult');
+    document.getElementById('vp-aitext').innerHTML='<b>'+h(p.product_name)+'</b> — '+h(p.category)+'<br><span style="color:var(--muted)">'+h(p.target_audience)+'</span>';
+    el.classList.add('vis');
+    btn.textContent='&#128269; Re-analisis';
+  }catch(err){alert('Error: '+err.message);btn.textContent='&#128269; Analisis Produk dengan AI';}
+  btn.disabled=false;
+}
+
+// pill controls
+function makePills(groupId,cb){
+  document.querySelectorAll('#'+groupId+' .pill').forEach(p=>{
+    p.onclick=()=>{document.querySelectorAll('#'+groupId+' .pill').forEach(x=>x.classList.remove('active'));p.classList.add('active');cb(p.dataset.val);};
+  });
+}
+makePills('v-style',v=>{vStyle=v;});
+makePills('v-dur',v=>{vDur=parseInt(v);updateSI();});
+makePills('i-style',v=>{iStyle=v;});
+makePills('i-ratio',v=>{iRatio=v;});
+document.querySelectorAll('#v-platforms .pcard').forEach(p=>{
+  p.onclick=()=>{
+    p.classList.toggle('active');
+    vPlatforms=[];let sd=6;
+    document.querySelectorAll('#v-platforms .pcard.active').forEach(x=>{vPlatforms.push(x.dataset.val);sd=parseInt(x.dataset.s);});
+    vScene=vPlatforms.length?sd:6; updateSI();
+  };
+});
+
+function updateSI(){
+  const c=Math.max(1,Math.ceil(vDur/vScene));
+  document.getElementById('sc-count').textContent=c+' scenes';
+  document.getElementById('sc-dur').textContent=vDur+'s';
+  document.getElementById('sc-per').textContent=vScene+'s/scene';
+}
+function scCount(){return Math.max(1,Math.ceil(vDur/vScene));}
+function purposes(n){
+  if(n===1)return['Hook + CTA'];
+  if(n===2)return['Hook','CTA'];
+  const mid=['Reveal','Demo','Benefit','Social Proof'];
+  const r=['Hook'];
+  for(let i=0;i<n-2;i++)r.push(mid[i%mid.length]);
+  r.push('CTA'); return r;
+}
+
+function loadingHTML(s){return`<div style="display:flex;flex-direction:column;gap:11px;padding:6px 0;"><div class="lbar on"><div class="lbar-in"></div></div><div class="stxt on" id="stxt">${s}</div></div>`;}
+function startCycle(arr){let i=0;return setInterval(()=>{i=(i+1)%arr.length;const el=document.getElementById('stxt');if(el)el.textContent=arr[i];},1900);}
+
+// ── VIDEO GENERATE ──
+async function generateVideo(angleCount=1){
+  const name=document.getElementById('vp-name').value.trim();
+  const desc=document.getElementById('vp-desc').value.trim();
+  const talent=document.getElementById('vt-text').value.trim();
+  const country=document.getElementById('v-country').value;
+  const social=document.getElementById('v-platform').value;
+  if(!name){alert('Nama produk wajib diisi!');return;}
+  const btn=document.getElementById('v-btn');
+  const btn3=document.getElementById('v-btn3');
+  btn.disabled=true; btn3.disabled=true;
+  btn.textContent='Generating...'; btn3.textContent='Generating...';
+
+  const sc=scCount(), ps=purposes(sc), lang=LANG[country];
+  const CTA_MAP={
+    'TikTok':'Klik keranjang kuning | CTA badge warna #FFD700 | Overlay text: "Klik Keranjang Kuning!" | End card: TikTok Shop cart button',
+    'Instagram Reels':'Klik link di bio | CTA badge gradient IG style | Overlay text: "Link di Bio!" atau "Swipe Up" | Tone: lifestyle-forward',
+    'YouTube Shorts':'Cek deskripsi di bawah | CTA badge merah YouTube | Overlay text: "Cek Link Deskripsi" | End card: YouTube subscribe button',
+    'Shopee Video':'Klik keranjang oranye | CTA badge warna #EE4D2D (Shopee orange) | Overlay text: "Klik Keranjang Oranye!" atau "Beli di Shopee" | End card: Shopee cart button | Tone: deal-focused, promo-forward'
+  };
+  const ctaGuide=CTA_MAP[social]||CTA_MAP['TikTok'];
+  const sys=`You are OMNI FLASH AFFILIATE ENGINE v4.0 – CINEMATIC AI STUDIO EDITION.
+Output ONLY valid JSON. No markdown, no explanation.
+Duration: ${vDur}s | Scene dur: ${vScene}s | Scenes: ${sc} | Purposes: ${ps.join(' → ')}
+Language: ${lang} | Style: ${vStyle} | Platforms: ${vPlatforms.join(', ')} | Social: ${social}
+
+CTA RULES FOR ${social.toUpperCase()}:
+${ctaGuide}
+Apply this CTA to: voice_over script ending, final scene overlay_design badge+headline, director_notes.
+
+Marketing angle (pick ONE): Problem,Curiosity,Hidden Benefit,Life Hack,Comparison,Pattern Interrupt,POV,Story,Before After,Emotional,Secret,Shocking Fact,Myth,Expert Tip
+
+Return JSON with keys: engine_name,edition,meta,product_analysis,marketing_angle,thumbnail,storyboard(EXACTLY ${sc} scenes),voice_over,sound_design,editing,director_notes
+Each scene: scene,duration_range,purpose,camera{movement,lens,speed},visual_prompt{environment,subject,composition,lighting,camera_motion,depth_of_field,quality,aspect_ratio},motion_prompt{camera,subject_motion,background_motion,transition},overlay_design{badge,headline,keyword,animation,position},caption`;
+
+  const baseParts=[];
+  if(b64store.vp) baseParts.push({type:'image',source:{type:'base64',media_type:b64store.vp.mime,data:b64store.vp.data}});
+  if(b64store.vt) baseParts.push({type:'image',source:{type:'base64',media_type:b64store.vt.mime,data:b64store.vt.data}});
+
+  const vout=document.getElementById('v-out');
+  vout.innerHTML=loadingHTML(angleCount>1?'Generating '+angleCount+' angles secara paralel...':'Menganalisis produk dan memilih marketing angle...');
+  const timer=startCycle(['Menganalisis produk...','Menyusun storyboard '+sc+' scene...','Menulis visual & motion prompt...','Membuat voice over script...','Finalisasi JSON...']);
+
+  const ANGLE_LIST=['Problem','Curiosity','Hidden Benefit','Life Hack','Comparison','Pattern Interrupt','POV','Story','Before After','Emotional','Secret','Shocking Fact','Myth','Expert Tip'];
+  const shuffled=[...ANGLE_LIST].sort(()=>Math.random()-0.5);
+  const requestedAngles=shuffled.slice(0,angleCount);
+
+  async function fetchAngle(ai){
+    const angleInstruction=angleCount>1
+      ? `MARKETING ANGLE: You MUST use the "${requestedAngles[ai]}" angle. Do not use any other angle.`
+      : `Marketing angle (pick ONE): ${ANGLE_LIST.join(',')}`;
+    const sysFinal=sys.replace('Marketing angle (pick ONE): Problem,Curiosity,Hidden Benefit,Life Hack,Comparison,Pattern Interrupt,POV,Story,Before After,Emotional,Secret,Shocking Fact,Myth,Expert Tip', angleInstruction);
+    const parts=[...baseParts,{type:'text',text:`Product: ${name}\nDesc: ${desc||'see image'}\nTalent: ${talent||'auto'}\nCountry: ${country}\nStyle: ${vStyle}\n${sc} scenes @ ${vScene}s | Purposes: ${ps.join(', ')}\nAngle: ${requestedAngles[ai]||'auto'}\nGenerate complete JSON.`}];
+    const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01'},
+      body:JSON.stringify({model:MDL,max_tokens:4000,system:sysFinal,messages:[{role:'user',content:parts}]})});
+    const data=await res.json();
+    let raw=data.content?.map(c=>c.text||'').join('')||'';
+    let js=raw.trim();
+    const fence=js.match(/```(?:json)?\s*([\s\S]*?)```/); if(fence) js=fence[1].trim();
+    const bi=js.indexOf('{'); if(bi>0) js=js.slice(bi);
+    let parsed=null; try{parsed=JSON.parse(js);}catch(e){}
+    return {parsed,js,angle:requestedAngles[ai]||'Auto'};
+  }
+
+  try{
+    // Run all angle fetches IN PARALLEL — massively faster for 3 angles
+    const promises=Array.from({length:angleCount},(_,ai)=>fetchAngle(ai));
+    const results=await Promise.all(promises);
+    clearInterval(timer);
+    renderVideoResults(results,name,sc);
+  }catch(err){clearInterval(timer);vout.innerHTML=errBox(err.message);}
+  btn.disabled=false; btn3.disabled=false;
+  btn.textContent='Generate 1 Angle'; btn3.textContent='3 Angles Sekaligus';
+}
+
+function renderVideoResults(results,name,sc){
+  const vout=document.getElementById('v-out');
+  vout.innerHTML='';
+  if(results.length===1){
+    // Single angle: render directly into vout
+    const wrapper=document.createElement('div');
+    wrapper.style.cssText='display:flex;flex-direction:column;gap:14px;width:100%;';
+    vout.appendChild(wrapper);
+    renderVideo(results[0].parsed,results[0].js,name,sc,wrapper);
+    return;
+  }
+  // Multi-angle: render each angle in its own clearly separated box
+  results.forEach((r,i)=>{
+    const ANGLE_COLORS=['var(--accent)','var(--accent2)','var(--gold)'];
+    const color=ANGLE_COLORS[i%ANGLE_COLORS.length];
+    const box=document.createElement('div');
+    box.style.cssText=`border:2px solid ${color};border-radius:12px;overflow:hidden;margin-bottom:10px;`;
+
+    // Angle header bar
+    const hdr=document.createElement('div');
+    hdr.style.cssText=`background:rgba(0,0,0,.35);border-bottom:1px solid ${color};padding:10px 16px;display:flex;align-items:center;gap:10px;`;
+    const copyAllKey=stash(r.js);
+    hdr.innerHTML=`<span style="font-weight:700;font-size:13px;color:${color};letter-spacing:.06em;text-transform:uppercase;">ANGLE ${i+1}</span><span style="font-size:12px;color:var(--muted);">•</span><span style="font-size:13px;font-weight:600;color:var(--text);">${h(r.angle)}</span><button class="btn-copy" data-copy-key="${copyAllKey}" style="margin-left:auto;border-color:${color};color:${color};">Copy JSON</button>`;
+    box.appendChild(hdr);
+
+    // Content area
+    const content=document.createElement('div');
+    content.style.cssText='display:flex;flex-direction:column;gap:14px;padding:14px;';
+    box.appendChild(content);
+    vout.appendChild(box);
+    renderVideo(r.parsed,r.js,name,sc,content);
+  });
+}
+
+function renderVideo(parsed,raw,name,sc,container){
+  container=container||document.getElementById('v-out');
+  // Use a unique prefix per container call to avoid storyboard tab ID conflicts
+  const uid='v'+(++_si);
+  const angle=parsed?.marketing_angle?.name||'Auto';
+  let html=`<div class="out-hdr"><span class="out-title">${h(name)}</span><span class="abadge">${h(angle)}</span></div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;">
+    <span class="tag-pill" style="background:rgba(124,92,252,.12);border:1px solid rgba(124,92,252,.25);color:var(--accent);">${vDur}s</span>
+    <span class="tag-pill" style="background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.25);color:var(--gold);">${sc} scenes</span>
+    <span class="tag-pill" style="background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.25);color:var(--success);">${vScene}s/scene</span>
+    <span class="tag-pill" style="background:rgba(252,92,125,.12);border:1px solid rgba(252,92,125,.25);color:var(--accent2);">${h(vStyle)}</span>
+  </div>`;
+  if(parsed){
+    ['product_analysis','marketing_angle','thumbnail','voice_over','editing'].forEach(k=>{
+      if(parsed[k]) html+=jblock(k.replace(/_/g,' '),JSON.stringify(parsed[k],null,2));
+    });
+    if(parsed.storyboard&&Array.isArray(parsed.storyboard)){
+      html+=`<div class="jblock"><div class="jblock-hdr"><span class="jblock-title">Storyboard (${parsed.storyboard.length} scenes)</span><button class="btn-copy" data-copy-key="${stash(JSON.stringify(parsed.storyboard,null,2))}">Copy</button></div>
+      <div style="padding:9px 12px;display:flex;gap:5px;flex-wrap:wrap;border-bottom:1px solid var(--border);">`;
+      parsed.storyboard.forEach((sc2,i)=>{html+=`<div class="stab ${i===0?'active':''}" onclick="showScU('${uid}',${i})">${h(sc2.purpose||'Scene '+(i+1))}</div>`;});
+      html+=`</div>`;
+      parsed.storyboard.forEach((sc2,i)=>{html+=`<div class="jcontent scene-p" id="${uid}-scp-${i}" style="${i>0?'display:none':''}">${shl(JSON.stringify(sc2,null,2))}</div>`;});
+      html+=`</div>`;
+    }
+  }
+  html+=jblock('Full JSON',raw,true);
+  html+=`<div style="display:flex;gap:9px;"><button class="btn-dl" data-dl-key="${stash(raw)}" data-dl-name="${name.replace(/[^a-z0-9]/gi,'-')}-video-prompt.json">&#8659; Download JSON</button></div>`;
+  container.innerHTML=html;
+}
+
+// ── IMAGE GENERATE ──
+async function generateImage(){
+  const name=document.getElementById('ip-name').value.trim();
+  const desc=document.getElementById('ip-desc').value.trim();
+  const talent=document.getElementById('it-text').value.trim();
+  if(!name&&!b64store.ip){alert('Upload produk atau isi nama produk!');return;}
+  const btn=document.getElementById('i-btn');
+  btn.disabled=true; btn.textContent='Generating...';
+
+  const sys=`You are an expert AI image prompt engineer for commercial product photography.
+Output ONLY valid JSON. No markdown, no explanation.
+Generate prompts for TWO shot types, TWO formats each.
+
+Shot types:
+1. HERO SHOT — product only, no people, premium studio or lifestyle setting
+2. LIFESTYLE SHOT — product with model/talent in natural usage context
+
+Formats per shot:
+- midjourney: optimized Midjourney prompt ending with --ar ${iRatio} --v 6.1 --style raw --q 2
+- flux: detailed natural language for Flux/DALL-E
+
+Visual style: ${iStyle} | Aspect ratio: ${iRatio}
+Talent: ${talent||b64store.it?'see uploaded image or: '+talent:'auto-select appropriate demographic for product'}
+
+Return JSON:
+{
+  "hero_shot":{"concept":"","midjourney":"","flux":""},
+  "lifestyle_shot":{"concept":"","midjourney":"","flux":""},
+  "negative_prompt":"",
+  "style_notes":""
+}`;
+
+  const parts=[];
+  if(b64store.ip) parts.push({type:'image',source:{type:'base64',media_type:b64store.ip.mime,data:b64store.ip.data}});
+  if(b64store.it) parts.push({type:'image',source:{type:'base64',media_type:b64store.it.mime,data:b64store.it.data}});
+  parts.push({type:'text',text:`Product: ${name||'see image'}\nDesc: ${desc||'analyze from image'}\nTalent: ${talent||'auto'}\nStyle: ${iStyle}\nRatio: ${iRatio}\nGenerate 4 image prompts.`});
+
+  document.getElementById('i-out').innerHTML=loadingHTML('Menganalisis mood dan visual style...');
+  const timer=startCycle(['Menganalisis visual style...','Menyusun hero shot concept...','Menulis lifestyle shot prompt...','Formatting untuk MJ & Flux...']);
+
+  try{
+    const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01'},
+      body:JSON.stringify({model:MDL,max_tokens:2000,system:sys,messages:[{role:'user',content:parts}]})});
+    clearInterval(timer);
+    const data=await res.json();
+    let raw=data.content?.map(c=>c.text||'').join('')||'';
+    let js=raw.trim();
+    const fence=js.match(/```(?:json)?\s*([\s\S]*?)```/); if(fence) js=fence[1].trim();
+    const bi=js.indexOf('{'); if(bi>0) js=js.slice(bi);
+    let parsed=null; try{parsed=JSON.parse(js);}catch(e){}
+    renderImage(parsed,js,name);
+  }catch(err){clearInterval(timer);document.getElementById('i-out').innerHTML=errBox(err.message);}
+  btn.disabled=false; btn.textContent='Generate Image Prompts';
+}
+
+function renderImage(parsed,raw,name){
+  let html=`<div class="out-hdr"><span class="out-title">${h(name||'Image Prompts')}</span><span class="abadge">${h(iStyle)}</span></div>
+  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:4px;">
+    <span class="tag-pill" style="background:rgba(124,92,252,.12);border:1px solid rgba(124,92,252,.25);color:var(--accent);">${iRatio}</span>
+    <span class="tag-pill" style="background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.25);color:var(--success);">Hero + Lifestyle</span>
+    <span class="tag-pill" style="background:rgba(245,200,66,.12);border:1px solid rgba(245,200,66,.25);color:var(--gold);">Midjourney + Flux</span>
+  </div>`;
+
+  if(parsed){
+    const shots=[{key:'hero_shot',label:'Hero Shot',hc:'ib-hero'},{key:'lifestyle_shot',label:'Lifestyle Shot',hc:'ib-life'}];
+    shots.forEach(s=>{
+      const shot=parsed[s.key]; if(!shot) return;
+      html+=`<div class="icard"><div class="icard-hdr"><div style="display:flex;align-items:center;gap:8px;"><span class="ibadge ${s.hc}">${s.label}</span><span style="font-size:12px;color:var(--muted);">${h(shot.concept||'')}</span></div></div>`;
+      if(shot.midjourney){html+=`<div style="border-bottom:1px solid var(--border);"><div style="padding:8px 13px 0;display:flex;align-items:center;justify-content:space-between;"><span class="ibadge ib-mj">Midjourney</span><button class="btn-copy" data-copy-key="${stash(shot.midjourney)}">Copy</button></div><div class="ptxt">${h(shot.midjourney)}</div></div>`;}
+      if(shot.flux){html+=`<div><div style="padding:8px 13px 0;display:flex;align-items:center;justify-content:space-between;"><span class="ibadge ib-flux">Flux / DALL-E</span><button class="btn-copy" data-copy-key="${stash(shot.flux)}">Copy</button></div><div class="ptxt">${h(shot.flux)}</div></div>`;}
+      html+=`</div>`;
+    });
+    if(parsed.negative_prompt){html+=`<div class="icard"><div class="icard-hdr"><span class="ibadge ib-neg">Negative Prompt</span><button class="btn-copy" data-copy-key="${stash(parsed.negative_prompt)}">Copy</button></div><div class="ptxt">${h(parsed.negative_prompt)}</div></div>`;}
+    if(parsed.style_notes){html+=`<div style="background:rgba(124,92,252,.06);border:1px solid rgba(124,92,252,.15);border-radius:var(--radius);padding:11px 13px;font-size:13px;color:var(--muted);"><strong style="color:var(--accent);font-size:10px;letter-spacing:.08em;text-transform:uppercase;">Style Notes</strong><br>${h(parsed.style_notes)}</div>`;}
+  }else{html+=jblock('Raw Output',raw,true);}
+  html+=`<div style="display:flex;gap:9px;"><button class="btn-dl" data-dl-key="${stash(raw)}" data-dl-name="image-prompts.json">&#8659; Download JSON</button></div>`;
+  document.getElementById('i-out').innerHTML=html;
+}
+
+// ── Helpers ──
+function jblock(label,content,isRaw){const k=stash(content);return`<div class="jblock"><div class="jblock-hdr"><span class="jblock-title">${h(label)}</span><button class="btn-copy" data-copy-key="${k}">Copy</button></div><div class="jcontent">${isRaw?h(content):shl(content)}</div></div>`;}
+function showScU(uid,idx){
+  // Show/hide scenes scoped to this specific uid prefix (avoids cross-angle conflicts)
+  document.querySelectorAll(`[id^="${uid}-scp-"]`).forEach(p=>{
+    const i=parseInt(p.id.replace(uid+'-scp-',''));
+    p.style.display=i===idx?'':'none';
+  });
+  // Update stab active state — find the stab that called this uid
+  // We walk up from the stab buttons inside the same jblock
+  const allStabs=document.querySelectorAll('.stab');
+  allStabs.forEach(t=>{
+    const fn=t.getAttribute('onclick')||'';
+    if(fn.includes(`'${uid}'`)){
+      const iMatch=fn.match(/,(\d+)\)/);
+      if(iMatch) t.classList.toggle('active',parseInt(iMatch[1])===idx);
+    }
+  });
+}
+function showSc(idx){document.querySelectorAll('.scene-p').forEach((p,i)=>p.style.display=i===idx?'':'none');document.querySelectorAll('.stab').forEach((t,i)=>t.classList.toggle('active',i===idx));}
+function shl(s){return h(s).replace(/"([^"]+)":/g,'<span class="jk">"$1"</span>:').replace(/: "([^"]*)"/g,': <span class="js">"$1"</span>').replace(/: (\d+)/g,': <span class="jn">$1</span>');}
+function h(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function errBox(msg){return`<div style="color:#f87171;padding:18px;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.3);border-radius:10px;"><strong>Error:</strong> ${h(msg)}</div>`;}
+function cpyTxt(btn,text){navigator.clipboard.writeText(text).then(()=>{btn.textContent='Copied!';btn.classList.add('copied');setTimeout(()=>{btn.textContent='Copy';btn.classList.remove('copied');},2000);});}
+function dlJSON(content,filename){const a=document.createElement('a');a.href='data:application/json;charset=utf-8,'+encodeURIComponent(content);a.download=filename;a.click();}
+
+updateSI();
+</script>
+</body>
+</html>
